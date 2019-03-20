@@ -140,18 +140,20 @@ add_action("add_meta_boxes", function () {
 		// URLs are correct in WordPress for the following post types
 		$correctUrls = ['post', 'page'];
 
+		$hasVarnish = get_option("s24_cache_isVarnish") ? true : false;
+
 		if (in_array($type, $correctUrls)) {
 
 			?>
 
-			<p>Environment: <strong
-					style="padding: 0.3em 0.6em; background-color: <?php echo $colour; ?>"><?php echo $env; ?></strong></span>
-			</p>
+            <p>Environment: <strong
+                        style="padding: 0.3em 0.6em; background-color: <?php echo $colour; ?>"><?php echo $env; ?></strong></span>
+            </p>
 
-			<p><a target="_blank" href="<?php echo $link; ?>">View page on front-end website</a></p>
+            <p><a target="_blank" href="<?php echo $link; ?>">View page on front-end website</a></p>
 
-			<input type="button" onclick="clearCache('<?php echo $path; ?>')" value="Clear cache"/>
-			<p style="display: none;" id="cache-result"></p>
+            <input type="button" onclick="clearCache('<?php echo $path; ?>', '<?php echo $hasVarnish ? true : false ?>', '<?php echo $link ?>')" value="Clear cache"/>
+            <p style="display: none;" id="cache-result"></p>
 
 			<?php
 
@@ -186,3 +188,13 @@ add_action('admin_enqueue_scripts', function ($hook) {
 		)
 	);
 });
+
+add_filter('plugin_action_links_'.plugin_basename(__FILE__), 's24_cache_add_plugin_page_settings_link');
+function s24_cache_add_plugin_page_settings_link( $links ) {
+	$links[] = '<a href="' .
+	           admin_url( 'options-general.php?page=s24_wp_headless_cms' ) .
+	           '">' . __('Settings') . '</a>';
+	return $links;
+}
+
+include_once "s24-wp-headless-cms-settings.php";
